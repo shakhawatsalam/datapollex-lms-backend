@@ -1,7 +1,19 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
-// user interface
+/**
+ * Interface for a course in the user's courses array
+ */
+interface ICourse {
+  courseId: string;
+  completedLectures: string[];
+  progress?: number;
+}
+
+/**
+ * Interface for User document
+ */
 export interface IUser extends Document {
+  _id: Types.ObjectId;
   name: string;
   email: string;
   password: string;
@@ -9,20 +21,27 @@ export interface IUser extends Document {
     public_id: string;
     url: string;
   };
-  role: string;
-  //   isVerified: boolean;
-  // In IUser interface
-  courses: Array<{
-    courseId: string;
-    completedLectures: string[]; // Array of lecture IDs marked as complete
-    progress?: number; // Optional: Calculated percentage (e.g., completed / total lectures)
-  }>;
+  role: "user" | "admin";
+  courses: ICourse[];
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
 }
 
-// registration user
+/**
+ * Interface for user response (password is optional)
+ */
+export interface IUserResponse
+  extends Omit<
+    IUser,
+    "password" | "comparePassword" | "SignAccessToken" | "SignRefreshToken"
+  > {
+  password?: string;
+}
+
+/**
+ * Interface for user registration input
+ */
 export interface IRegistrationBody {
   name: string;
   email: string;
@@ -30,16 +49,25 @@ export interface IRegistrationBody {
   profilePic?: { public_id: string; url: string };
 }
 
+/**
+ * Interface for login request
+ */
 export interface ILoginRequest {
   email: string;
   password: string;
 }
 
+/**
+ * Interface for updating user information
+ */
 export interface IUpdateUserInfo {
   name?: string;
   email?: string;
 }
 
+/**
+ * Interface for updating profile picture
+ */
 export interface IUpdateProfilePicture {
   profilePic?: { public_id: string; url: string };
 }

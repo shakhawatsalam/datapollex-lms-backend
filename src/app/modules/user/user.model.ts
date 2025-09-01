@@ -1,8 +1,11 @@
 import mongoose, { Model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import { IUser } from "./user.interface";
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import config from "../../../config";
+import { IUser } from "./user.interface";
+
+import httpStatus from "http-status";
+import ApiError from "../../../errors/Apierror";
 
 const emailRegexPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -34,7 +37,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
         type: String,
         default:
           "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/man-user-circle-icon.png",
-      }, // Or a placeholder URL
+      },
     },
     role: {
       type: String,
@@ -52,31 +55,54 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Hash Password before saving
-
+/**
+ * Hash password before saving
+ */
 userSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("password")) {
-    next();
+    return next();
   }
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-//  Sing access token
+/**
+ * Sign access token
+ */
 userSchema.methods.SignAccessToken = function () {
-  return jwt.sign({ id: this._id }, config.access_token as string, {
-    expiresIn: "5m",
-  });
+  if (!config.jwt_secret) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "JWT secret is not defined"
+    );
+  }
+  return jwt.sign(
+    { id: this._id.toString(), role: this.role },
+    config.jwt_secret,
+    { expiresIn: config.jwt_access_expires_in } as SignOptions
+  );
 };
 
-//  Sign Refresh Token
+/**
+ * Sign refresh token
+ */
 userSchema.methods.SignRefreshToken = function () {
-  return jwt.sign({ id: this._id }, config.refresh_token as string, {
-    expiresIn: "3d",
-  });
+  if (!config.jwt_refresh_secret) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "JWT refresh secret is not defined"
+    );
+  }
+  return jwt.sign(
+    { id: this._id.toString(), role: this.role },
+    config.jwt_refresh_secret,
+    { expiresIn: config.jwt_refresh_expires_in } as SignOptions
+  );
 };
 
-//  compare password
+/**
+ * Compare password
+ */
 userSchema.methods.comparePassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

@@ -1,13 +1,12 @@
-import { ErrorRequestHandler, Request, Response } from "express";
+import { ErrorRequestHandler, Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import { MongoError } from "mongodb";
-import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { IGenericErrorResponse } from "../../interfaces/common";
 import handleValidationError from "../../errors/handleValidationError";
 import handleCastError from "../../errors/handleCastError";
 import ApiError from "../../errors/Apierror";
 
-// Define error response interface for Express response
 interface IErrorResponse {
   success: boolean;
   message: string;
@@ -18,14 +17,15 @@ interface IErrorResponse {
 const globalErrorHandler: ErrorRequestHandler = (
   err: any,
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction // Explicitly include next
 ) => {
   // Log error for debugging
   console.error("Error:", {
-    message: err.message,
-    stack: err.stack,
-    path: req.path,
-    method: req.method,
+    message: err?.message,
+    stack: err?.stack,
+    path: req?.path,
+    method: req?.method,
   });
 
   let statusCode = 500;
@@ -66,11 +66,11 @@ const globalErrorHandler: ErrorRequestHandler = (
         };
   }
   // Handle JWT Errors
-  else if (err instanceof JsonWebTokenError) {
+  else if (err instanceof jwt.JsonWebTokenError) {
     statusCode = 401;
     message = "Invalid Token";
     errorMessages = { message: "The provided token is invalid" };
-  } else if (err instanceof TokenExpiredError) {
+  } else if (err instanceof jwt.TokenExpiredError) {
     statusCode = 401;
     message = "Token Expired";
     errorMessages = { message: "The token has expired, please log in again" };
@@ -92,8 +92,11 @@ const globalErrorHandler: ErrorRequestHandler = (
     success: false,
     message,
     errorMessages,
-    stack: process.env.NODE_ENV !== "production" ? err.stack : undefined,
+    stack: process.env.NODE_ENV !== "production" ? err?.stack : undefined,
   } as IErrorResponse);
+
+  // Call next() to ensure the middleware chain continues (optional, but good practice)
+  next();
 };
 
 export default globalErrorHandler;

@@ -7,10 +7,10 @@
     // Environment Settings
     "target": "ES2022",
     "module": "commonjs",
+    "moduleResolution": "node",
     "esModuleInterop": true,
-    // "moduleResolution": "Node",
-    "lib": ["ESNext"],
-    "types": ["node"],
+    "lib": ["ES2022", "DOM"],
+    "types": ["node", "express"],
 
     // Other Outputs
     "sourceMap": true,
@@ -29,6 +29,6 @@
     // Optional cleanups
     "isolatedModules": true
   },
-  "include": ["src"],
+  "include": ["src/**/*", "src/app/interfaces/*.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
