@@ -1,9 +1,10 @@
 import { Document, Types } from "mongoose";
+import { ICourse } from "../course/course.interface";
 
 /**
  * Interface for a course in the user's courses array
  */
-interface ICourse {
+export interface IUserCourse {
   courseId: string;
   completedLectures: string[];
   progress?: number;
@@ -22,7 +23,7 @@ export interface IUser extends Document {
     url: string;
   };
   role: "user" | "admin";
-  courses: ICourse[];
+  courses: IUserCourse[];
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
