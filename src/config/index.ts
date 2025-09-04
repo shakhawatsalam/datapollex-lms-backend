@@ -3,7 +3,6 @@ import path from "path";
 
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
-
 interface AppConfig {
   env: string;
   port: number;
@@ -13,6 +12,9 @@ interface AppConfig {
   jwt_refresh_secret: string | undefined;
   jwt_access_expires_in: string;
   jwt_refresh_expires_in: string;
+  cloud_name: string;
+  cloud_api_key: string;
+  cloud_secret_key: string;
 }
 
 export default {
@@ -24,4 +26,7 @@ export default {
   jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
   jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN || "1h",
   jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
+  cloud_name: process.env.CLOUD_NAME,
+  cloud_api_key: process.env.CLOUD_API_KEY,
+  cloud_secret_key: process.env.CLOUD_SECRET_KEY,
 } as AppConfig;

@@ -21,6 +21,17 @@ router.post("/register", UserController.register);
 router.post("/login", UserController.login);
 
 /**
+ * @route POST /api/v1/users/logout
+ * @desc Log out a user and clear refresh token cookie
+ * @access Private (requires JWT, user or admin)
+ */
+router.post(
+  "/logout",
+  auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+  UserController.logout
+);
+
+/**
  * @route POST /api/v1/users/refresh-token
  * @desc Generate new access token using refresh token
  * @access Public

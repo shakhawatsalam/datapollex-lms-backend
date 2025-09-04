@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
-import { UserService } from "./user.service";
+
 import { IGenericResponse } from "../../../interfaces/common";
 import config from "../../../config";
 
 import { IUserResponse } from "./user.interface";
 import ApiError from "../../../errors/Apierror";
+import { UserService } from "./user.service";
 
 export class UserController {
   static register = catchAsync(async (req: Request, res: Response) => {
@@ -38,6 +39,24 @@ export class UserController {
       data: { user, accessToken },
       meta: {},
     } as IGenericResponse<{ user: IUserResponse; accessToken: string }>);
+  });
+
+  static logout = catchAsync(async (req: Request, res: Response) => {
+    // Clear the refresh token cookie
+    res.clearCookie("refreshToken", {
+      secure: config.env === "production",
+      httpOnly: true,
+      sameSite: "strict",
+    });
+
+    const result = await UserService.logout();
+
+    res.status(httpStatus.OK).json({
+      success: true,
+      data: result,
+      meta: {},
+      message: "Logged out successfully",
+    } as IGenericResponse<{ message: string }>);
   });
 
   static refreshToken = catchAsync(async (req: Request, res: Response) => {

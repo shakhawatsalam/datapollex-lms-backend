@@ -1,11 +1,18 @@
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
+import { v2 as cloudinary } from "cloudinary";
 import config from "./config/index";
 
 // Initialize server variable
 let server: Server;
 
+cloudinary.config({
+  cloud_name: config.cloud_name,
+  api_key: config.cloud_api_key,
+  api_secret: config.cloud_secret_key,
+  secure: true,
+});
 // Bootstrap function to connect to database and start server
 async function bootstrap() {
   try {
@@ -24,14 +31,14 @@ async function bootstrap() {
     });
   } catch (error) {
     console.error("Failed to connect to database or start server:", error);
-    process.exitCode = 1; 
+    process.exitCode = 1;
   }
 }
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (error) => {
   console.error("Uncaught Exception:", error);
-  process.exitCode = 1; 
+  process.exitCode = 1;
 });
 
 // Handle unhandled promise rejections
@@ -46,9 +53,9 @@ process.on("unhandledRejection", async (error) => {
     } catch (err) {
       console.error("Error closing database connection:", err);
     }
-    process.exitCode = 1; 
+    process.exitCode = 1;
   } else {
-    process.exitCode = 1; 
+    process.exitCode = 1;
   }
 });
 
@@ -65,7 +72,7 @@ process.on("SIGTERM", async () => {
       console.error("Error closing database connection:", err);
     }
   }
-  process.exitCode = 0; 
+  process.exitCode = 0;
 });
 
 // Start the application

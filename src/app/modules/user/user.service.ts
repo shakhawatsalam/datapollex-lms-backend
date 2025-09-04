@@ -81,6 +81,15 @@ export class UserService {
   }
 
   /**
+   * Log out a user - clear refresh token cookie
+   */
+  static async logout(): Promise<{ message: string }> {
+    // Note: The actual logout logic (clearing cookies) is handled in the controller
+    // This method can be extended to handle token blacklisting if needed
+    return { message: "Logout successful" };
+  }
+
+  /**
    * Generate new access token using refresh token
    */
   static async refreshToken(token: string): Promise<{ accessToken: string }> {
