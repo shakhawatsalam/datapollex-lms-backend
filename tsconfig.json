@@ -1,25 +1,26 @@
 {
+  
   "compilerOptions": {
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
 
     // Environment Settings
-    "target": "ES2022",
-    "module": "Node16", // Changed from "commonjs" to support ESM
-    "moduleResolution": "Node16", // Changed from "node" to support ESM
+    "target": "es2016",
+    "module": "commonjs",
+    // "moduleResolution": "node",
     "esModuleInterop": true,
-    "lib": ["ES2022", "DOM"],
-    "types": ["node", "express"],
+    // "lib": ["ES2022", "DOM"],
+    // "types": ["node", "express"],
 
     // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    // "sourceMap": true,
+    // "declaration": true,
+    // "declarationMap": true,
 
     // Stricter Typechecking
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    // "noUncheckedIndexedAccess": true,
+    // "exactOptionalPropertyTypes": true,
 
     // Recommended
     "strict": true,
@@ -27,8 +28,8 @@
     "forceConsistentCasingInFileNames": true,
 
     // Optional cleanups
-    "isolatedModules": true
+    // "isolatedModules": true
   },
-  "include": ["src/**/*", "src/app/interfaces/*.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  // "include": ["src/**/*", "src/app/interfaces/*.d.ts"],
+  // "exclude": ["node_modules", "dist"]
 }

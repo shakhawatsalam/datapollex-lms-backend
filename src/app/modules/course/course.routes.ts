@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import { CourseController } from "./course.controller";
 import auth from "../../middlewares/auth";
-import { ENUM_USER_ROLE } from "../../../enums/user";
+import { ENUM_USER_ROLE } from "../../../enums/user.js";
 import httpStatus from "http-status";
 import ApiError from "../../../errors/Apierror";
 
