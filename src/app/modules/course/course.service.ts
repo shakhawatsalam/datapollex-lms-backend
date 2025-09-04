@@ -1,15 +1,11 @@
+// course.service.ts (unchanged from the provided version)
 import { Document, Types } from "mongoose";
 import httpStatus from "http-status";
-import {
-  
-  IUserResponse,
-  IUserCourse,
-} from "../user/user.interface";
+import { IUserResponse, IUserCourse } from "../user/user.interface";
 import CourseModel from "./course.model";
 import UserModel from "../user/user.model";
 import { ICourse, ILecture, IModule } from "./course.interface";
 import ApiError from "../../../errors/Apierror";
-
 
 interface CreateCourseInput {
   title: string;

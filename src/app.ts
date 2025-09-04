@@ -7,7 +7,6 @@ import routes from "./app/routes";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import { IGenericResponse } from "./interfaces/common";
 
-
 // Initialize Express app
 const app: Application = express();
 
@@ -20,7 +19,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); 
+app.use(cookieParser());
 
 // API Routes
 app.use("/api/v1", routes);

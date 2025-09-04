@@ -1,17 +1,23 @@
 import express from "express";
+import multer from "multer";
 import { CourseController } from "./course.controller";
 import auth from "../../middlewares/auth";
 import { ENUM_USER_ROLE } from "../../../enums/user";
 
-
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 /**
  * @route POST /api/v1/courses
  * @desc Create a new course
  * @access Private (requires JWT, admin role)
  */
-router.post("/", auth(ENUM_USER_ROLE.ADMIN), CourseController.createCourse);
+router.post(
+  "/",
+  auth(ENUM_USER_ROLE.ADMIN),
+  upload.single("thumbnail"),
+  CourseController.createCourse
+);
 
 /**
  * @route GET /api/v1/courses
@@ -32,7 +38,12 @@ router.get("/:id", CourseController.getCourseById);
  * @desc Update a course
  * @access Private (requires JWT, admin role)
  */
-router.patch("/:id", auth(ENUM_USER_ROLE.ADMIN), CourseController.updateCourse);
+router.patch(
+  "/:id",
+  auth(ENUM_USER_ROLE.ADMIN),
+  upload.single("thumbnail"),
+  CourseController.updateCourse
+);
 
 /**
  * @route DELETE /api/v1/courses/:id
@@ -112,7 +123,7 @@ router.delete(
 );
 
 /**
- * @route GET /api/v1/lectures
+ * @route GET /api/v1/courses/lectures
  * @desc Get all lectures with optional course and module filters
  * @access Public
  */

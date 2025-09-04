@@ -6,19 +6,58 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { IUserResponse } from "../user/user.interface";
 import { ICourse, ILecture, IModule } from "./course.interface";
 import ApiError from "../../../errors/Apierror";
+import { v2 as cloudinary } from "cloudinary";
+import streamifier from "streamifier";
 
 export class CourseController {
   /**
    * Create a new course
    */
   static createCourse = catchAsync(async (req: Request, res: Response) => {
-    const courseData = req.body;
-    const course = await CourseService.createCourse(courseData);
-    res.status(httpStatus.CREATED).json({
-      success: true,
-      data: course,
-      meta: {},
-    } as IGenericResponse<ICourse>);
+    let courseData: ICourse;
+    
+    // Parse JSON data from form-data
+    try {
+      courseData = JSON.parse(req.body.courseData);
+    } catch (error) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Invalid course data format");
+    }
+
+    // Handle thumbnail upload if provided
+    if (req.file) {
+      try {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "course_thumbnails",
+            resource_type: "image",
+          },
+          (error, result) => {
+            if (error) {
+              throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to upload thumbnail");
+            }
+            courseData.thumbnail = {
+              public_id: result!.public_id,
+              url: result!.secure_url,
+            };
+            // Continue with course creation after upload
+            CourseService.createCourse(courseData).then((course) => {
+              res.status(httpStatus.CREATED).json({
+                success: true,
+                data: course,
+                meta: {},
+              } as IGenericResponse<ICourse>);
+            }).catch((err) => {
+              throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to create course");
+            });
+          }
+        );
+        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+      } catch (error) {
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to upload thumbnail");
+      }
+    } else {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Thumbnail is required");
+    }
   });
 
   /**
@@ -54,16 +93,60 @@ export class CourseController {
    */
   static updateCourse = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
+    let courseData: ICourse;
+    
     if (!id) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Course ID is required");
     }
-    const updateData = req.body;
-    const course = await CourseService.updateCourse(id, updateData);
-    res.status(httpStatus.OK).json({
-      success: true,
-      data: course,
-      meta: {},
-    } as IGenericResponse<ICourse>);
+
+    // Parse JSON data from form-data
+    try {
+      courseData = JSON.parse(req.body.courseData);
+    } catch (error) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Invalid course data format");
+    }
+
+    // Handle thumbnail upload if provided
+    if (req.file) {
+      try {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "course_thumbnails",
+            resource_type: "image",
+          },
+          (error, result) => {
+            if (error) {
+              throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to upload thumbnail");
+            }
+            courseData.thumbnail = {
+              public_id: result!.public_id,
+              url: result!.secure_url,
+            };
+            // Continue with course update after upload
+            CourseService.updateCourse(id, courseData).then((course) => {
+              res.status(httpStatus.OK).json({
+                success: true,
+                data: course,
+                meta: {},
+              } as IGenericResponse<ICourse>);
+            }).catch((err) => {
+              throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to update course");
+            });
+          }
+        );
+        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+      } catch (error) {
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to upload thumbnail");
+      }
+    } else {
+      // Update course without changing thumbnail
+      const course = await CourseService.updateCourse(id, courseData);
+      res.status(httpStatus.OK).json({
+        success: true,
+        data: course,
+        meta: {},
+      } as IGenericResponse<ICourse>);
+    }
   });
 
   /**
@@ -286,3 +369,4 @@ export class CourseController {
     }
   );
 }
+;
