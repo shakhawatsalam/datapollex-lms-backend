@@ -1,5 +1,5 @@
 import { Document, Types } from "mongoose";
-import { ICourse } from "../course/course.interface";
+
 
 /**
  * Interface for a course in the user's courses array

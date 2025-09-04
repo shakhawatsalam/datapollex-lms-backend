@@ -10,6 +10,9 @@ import ApiError from "../../../errors/Apierror";
 import { v2 as cloudinary } from "cloudinary";
 import streamifier from "streamifier";
 import * as crypto from "crypto";
+import { Types } from "mongoose";
+import CourseModel from "./course.model";
+import userModel from "../user/user.model";
 
 export class CourseController {
   /**
