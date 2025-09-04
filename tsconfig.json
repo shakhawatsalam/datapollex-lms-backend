@@ -6,8 +6,8 @@
 
     // Environment Settings
     "target": "ES2022",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "Node16", // Changed from "commonjs" to support ESM
+    "moduleResolution": "Node16", // Changed from "node" to support ESM
     "esModuleInterop": true,
     "lib": ["ES2022", "DOM"],
     "types": ["node", "express"],
